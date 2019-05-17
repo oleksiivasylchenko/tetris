@@ -1,0 +1,36 @@
+{
+  "name": "tetris",
+  "version": "1.0.0",
+  "description": "Tetris game with PIXI.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --mode=development",
+    "start": "webpack-dev-server --mode=development --env.app=tetris"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oleksiivasylchenko/tetris.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/oleksiivasylchenko/tetris/issues"
+  },
+  "homepage": "https://github.com/oleksiivasylchenko/tetris#readme",
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.5",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-stage-0": "^6.24.1",
+    "pixi.js": "^5.0.2",
+    "webpack": "^4.31.0",
+    "webpack-cli": "^3.3.2",
+    "webpack-dev-server": "^3.4.0",
+    "whatwg-fetch": "^3.0.0"
+  },
+  "dependencies": {
+  }
+}
