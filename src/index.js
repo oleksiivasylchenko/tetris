@@ -2,8 +2,6 @@ import * as PIXI from 'pixi.js'
 import Figure from './models/Figure';
 import MainStage from './models/MainStage';
 
-const step = 16;
-
 const f1 = new Figure([
   {x: 0,y: 0},
   {x: 1, y: 0},
@@ -17,12 +15,6 @@ const f2 = new Figure([
   {x: 1, y: 1},
   {x: 2, y: 1}
 ], 0xFF0000);
-
-/*const f1Element = f1.getElement();
- const f2Element = f2.getElement();*/
-
-
-
 
 let type = "WebGL";
 if(!PIXI.utils.isWebGLSupported()){

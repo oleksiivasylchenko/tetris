@@ -1,6 +1,8 @@
 import * as PIXI from 'pixi.js'
 
-const step = 16;
+import {
+  STEP
+} from '../config';
 
 export default class Box {
   x = 0;
@@ -17,10 +19,10 @@ export default class Box {
     var graphics = new PIXI.Graphics();
     graphics.beginFill(this.color);
     // draw a rectangle
-    graphics.drawRect(0, 0, step, step);
+    graphics.drawRect(0, 0, STEP, STEP);
 
-    graphics.x = this.x * step;
-    graphics.y = this.y * step;
+    graphics.x = this.x * STEP;
+    graphics.y = this.y * STEP;
 
     return graphics;
   }

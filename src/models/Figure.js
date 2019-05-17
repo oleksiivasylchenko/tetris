@@ -2,7 +2,9 @@ import * as PIXI from 'pixi.js'
 
 import Box from './Box';
 
-const step = 16;
+import {
+  STEP
+} from '../config';
 
 export default class Figure {
 
@@ -40,19 +42,19 @@ export default class Figure {
 
   getCoordsExtended () {
     return this.items.map(item => item.getCoords({
-      x: this.container.x / step,
-      y: this.container.y / step,
+      x: this.container.x / STEP,
+      y: this.container.y / STEP,
     }));
   }
 
   getNextDownCoords () {
-    return this.container.y + step;
+    return this.container.y + STEP;
   }
 
   getNextDownCoordsExtended () {
     return this.items.map(item => item.getNextDownCoords({
-      x: this.container.x / step,
-      y: this.container.y / step,
+      x: this.container.x / STEP,
+      y: this.container.y / STEP,
     }));
   }
 }
