@@ -1,10 +1,230 @@
-<!DOCTYPE html>
+`<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title></title>
+    <title>Title</title>
+    <script src="../libs/pixi.js"></script>
 </head>
-<body>
+<body style="background-color: lightgoldenrodyellow;">
+<script type="text/javascript">
+    const step = 16;
 
+    class MainStage {
+        width = 6;
+        height = 13;
+
+        currentItem = null;
+        items = [];
+        stage = null;
+        map = [];
+
+        addItem (item) {
+            this.items.push(item);
+            //console.log(this.items, 'Added. All items:');
+        }
+
+        getItems () {
+            return this.items;
+        }
+
+        start (stage) {
+            this.stage = stage;
+            this.tick();
+            /*this.interval = setInterval(() => {
+             this.tick();
+             }, 500);*/
+        }
+
+        addNext () {
+            const f1 = new Figure([
+                {x: 0 + this.items.length + 1,y: 0},
+                {x: 1 + this.items.length + 1, y: 0},
+                {x: 0 + this.items.length + 1, y: 1},
+                {x: 0 + this.items.length + 1, y: 2},
+            ], 0xFFFF00);
+
+            this.addItem(f1);
+            this.currentItem = f1;
+            this.stage.addChild(f1.getElement());
+        }
+
+        tick() {
+            // Add first figure
+            if (!this.items.length) {
+                this.addNext();
+            } else {
+                const nextCoords = this.currentItem.getNextDownCoordsExtended();
+                //console.log(this.map, 'this.map');
+                const isPossible = nextCoords
+                        .every(item => {
+                            return (item.x <= this.width && item.y <= this.height)
+                                    && this.map.every(c => (c.x != item.x) || (c.y != item.y));
+                        });
+
+
+                if (isPossible) {
+                    this.currentItem.moveDown();
+                } else {
+                    console.log(nextCoords, 'impossible');
+
+                    this.currentItem.getCoordsExtended().map(item => this.map.push(item));
+                    console.log([...this.map], 'map');
+                    this.addNext();
+                    //clearInterval(this.interval);
+                }
+            }
+
+            setTimeout(() => {
+                this.tick();
+            }, 300);
+        }
+    }
+
+    class Box {
+        x = 0;
+        y = 0;
+        color = 0x000000;
+
+        constructor(map, color) {
+            this.x = map.x;
+            this.y = map.y;
+            this.color = color;
+        }
+
+        getElement () {
+            var graphics = new PIXI.Graphics();
+            graphics.beginFill(this.color);
+            // draw a rectangle
+            graphics.drawRect(0, 0, step, step);
+
+            graphics.x = this.x * step;
+            graphics.y = this.y * step;
+
+            return graphics;
+        }
+
+        getCoords (offset) {
+            return {
+                x: this.x + offset.x,
+                y: this.y + offset.y,
+            };
+        }
+
+        getNextDownCoords (offset) {
+            return {
+                x: this.x + offset.x,
+                y: this.y + offset.y + 1,
+            };
+        }
+    }
+
+    class Figure {
+
+        items = [];
+        container = null;
+
+        constructor(itemsMap, color) {
+
+            itemsMap.map(item => {
+                const box = new Box(item, color);
+                this.items.push(box)
+            });
+
+            this.container = this.generateElement();
+        }
+
+        generateElement() {
+            const container = new PIXI.Container();
+
+            this.items.map(item => {
+                const box = item.getElement();
+                container.addChild(box);
+            });
+
+            return container;
+        }
+
+        getElement () {
+            return this.container;
+        }
+
+        moveDown() {
+            this.container.y = this.getNextDownCoords();
+        }
+
+        getCoordsExtended () {
+            return this.items.map(item => item.getCoords({
+                x: this.container.x / step,
+                y: this.container.y / step,
+            }));
+        }
+
+        getNextDownCoords () {
+            return this.container.y + step;
+        }
+
+        getNextDownCoordsExtended () {
+            return this.items.map(item => item.getNextDownCoords({
+                x: this.container.x / step,
+                y: this.container.y / step,
+            }));
+        }
+    }
+
+    const f1 = new Figure([
+        {x: 0,y: 0},
+        {x: 1, y: 0},
+        {x: 0, y: 1},
+        {x: 0, y: 2},
+    ], 0xFFFF00);
+
+    const f2 = new Figure([
+        {x: 1, y: 0},
+        {x: 0, y: 1},
+        {x: 1, y: 1},
+        {x: 2, y: 1}
+    ], 0xFF0000);
+
+    /*const f1Element = f1.getElement();
+     const f2Element = f2.getElement();*/
+
+
+
+
+    let type = "WebGL";
+    if(!PIXI.utils.isWebGLSupported()){
+        type = "canvas"
+    }
+
+    PIXI.utils.sayHello(type);
+
+    //Create a Pixi Application
+    let app = new PIXI.Application({
+        width: 256,
+        height: 256,
+        //transparent: true,
+        border: '1px solid red',
+    });
+
+    //Add the canvas that Pixi automatically created for you to the HTML document
+    document.body.appendChild(app.view);
+
+    //app.renderer.backgroundColor = 0x061639;
+
+    console.log(app.stage);
+
+    const renderer = PIXI.autoDetectRenderer();
+
+    // allow renderer to resize itself as needed
+    renderer.autoResize = true;
+
+    // make sure the drawing board has the size we want, width first, then height
+    renderer.resize(256, 256);
+
+    // Generate and start Tetris
+    const mainStage = new MainStage();
+    mainStage.start(app.stage);
+
+</script>
 </body>
 </html>
