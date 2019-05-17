@@ -7,7 +7,7 @@ export default class MainStage {
   currentItem = null;
   items = [];
   stage = null;
-  map = [];
+  map = new Map();
 
   addItem (item) {
     this.items.push(item);
@@ -49,17 +49,16 @@ export default class MainStage {
       const isPossible = nextCoords
         .every(item => {
           return (item.x <= this.width && item.y <= this.height)
-            && this.map.every(c => (c.x != item.x) || (c.y != item.y));
+            && !this.map.has(item);
         });
 
 
       if (isPossible) {
         this.currentItem.moveDown();
       } else {
-        console.log(nextCoords, 'impossible');
+        //console.log(nextCoords, 'impossible');
 
-        this.currentItem.getCoordsExtended().map(item => this.map.push(item));
-        console.log([...this.map], 'map');
+        this.currentItem.getCoordsExtended().map(item => this.map.set(item, true));
         this.addNext();
         //clearInterval(this.interval);
       }
