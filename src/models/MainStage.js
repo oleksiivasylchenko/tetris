@@ -3,6 +3,7 @@ import Figure from './Figure';
 import {
   WIDTH,
   HEIGHT,
+  FIGURES_MAP,
 } from '../config';
 
 export default class MainStage {
@@ -29,16 +30,12 @@ export default class MainStage {
   }
 
   addNext () {
-    const f1 = new Figure([
-      {x: 0 + this.items.length + 1,y: 0},
-      {x: 1 + this.items.length + 1, y: 0},
-      {x: 0 + this.items.length + 1, y: 1},
-      {x: 0 + this.items.length + 1, y: 2},
-    ], 0xFFFF00);
+    const figureData = FIGURES_MAP[Math.floor(Math.random() * Math.floor(FIGURES_MAP.length))];
+    const figure = new Figure(figureData.coords, figureData.color);
 
-    this.addItem(f1);
-    this.currentItem = f1;
-    this.stage.addChild(f1.getElement());
+    this.addItem(figure);
+    this.currentItem = figure;
+    this.stage.addChild(figure.getElement());
   }
 
   tick() {
