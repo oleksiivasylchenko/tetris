@@ -1,10 +1,13 @@
 import Figure from './Figure';
 
 import {
+  STEP,
   WIDTH,
   HEIGHT,
   FIGURES_MAP,
 } from '../config';
+
+const offsetLeft = (WIDTH - 2) / 2 * STEP;
 
 export default class MainStage {
   currentItem = null;
@@ -31,7 +34,7 @@ export default class MainStage {
 
   addNext () {
     const figureData = FIGURES_MAP[Math.floor(Math.random() * Math.floor(FIGURES_MAP.length))];
-    const figure = new Figure(figureData.coords, figureData.color);
+    const figure = new Figure(figureData.coords, figureData.color, offsetLeft);
 
     this.addItem(figure);
     this.currentItem = figure;

@@ -11,17 +11,17 @@ export default class Figure {
   items = [];
   container = null;
 
-  constructor(itemsMap, color) {
+  constructor(itemsMap, color, offsetLeft) {
 
     itemsMap.map(item => {
       const box = new Box(item, color);
-      this.items.push(box)
+      this.items.push(box);
     });
 
-    this.container = this.generateElement();
+    this.container = this.generateElement(offsetLeft);
   }
 
-  generateElement() {
+  generateElement(offsetLeft) {
     const container = new PIXI.Container();
 
     this.items.map(item => {
@@ -29,6 +29,7 @@ export default class Figure {
       container.addChild(box);
     });
 
+    container.x += offsetLeft;
     return container;
   }
 
