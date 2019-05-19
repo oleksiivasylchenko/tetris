@@ -21,4 +21,22 @@ export const FIGURES_MAP = [
     ],
     color: 0xFF0000
   },
+  {
+    coords: [
+      {x: 0,y: 0},
+      {x: 0, y: 1},
+      {x: 0, y: 2},
+      {x: 0, y: 3},
+    ],
+    color: 0xFF00FF,
+  },
+  {
+    coords: [
+      {x: 0,y: 0},
+      {x: 0, y: 1},
+      {x: 1, y: 0},
+      {x: 1, y: 1},
+    ],
+    color: 0x00FFFF,
+  },
 ];
