@@ -2,6 +2,12 @@ import * as PIXI from 'pixi.js'
 import Figure from './models/Figure';
 import MainStage from './models/MainStage';
 
+import {
+  STEP,
+  WIDTH,
+  HEIGHT,
+} from './config';
+
 const f1 = new Figure([
   {x: 0,y: 0},
   {x: 1, y: 0},
@@ -25,8 +31,8 @@ PIXI.utils.sayHello(type);
 
 //Create a Pixi Application
 let app = new PIXI.Application({
-  width: 256,
-  height: 256,
+  width: WIDTH * STEP,
+  height: HEIGHT * STEP,
   //transparent: true,
   border: '1px solid red',
 });
@@ -44,7 +50,7 @@ const renderer = PIXI.autoDetectRenderer();
 renderer.autoResize = true;
 
 // make sure the drawing board has the size we want, width first, then height
-renderer.resize(256, 256);
+renderer.resize(WIDTH * STEP, HEIGHT * STEP);
 
 // Generate and start Tetris
 const mainStage = new MainStage();

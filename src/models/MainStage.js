@@ -1,13 +1,15 @@
 import Figure from './Figure';
 
-export default class MainStage {
-  width = 6;
-  height = 13;
+import {
+  WIDTH,
+  HEIGHT,
+} from '../config';
 
+export default class MainStage {
   currentItem = null;
   items = [];
   stage = null;
-  map = new Map();
+  map = [];
 
   addItem (item) {
     this.items.push(item);
@@ -48,19 +50,22 @@ export default class MainStage {
       //console.log(this.map, 'this.map');
       const isPossible = nextCoords
         .every(item => {
-          return (item.x <= this.width && item.y <= this.height)
-            && !this.map.has(item);
+          return (item.x < WIDTH && item.y < HEIGHT)
+            && (this.map[item.x] === undefined || this.map[item.x][item.y] === undefined);
         });
-
 
       if (isPossible) {
         this.currentItem.moveDown();
       } else {
         //console.log(nextCoords, 'impossible');
 
-        this.currentItem.getCoordsExtended().map(item => this.map.set(item, true));
+        this.currentItem.getCoordsExtended().map(item => {
+          if (this.map[item.x] === undefined) this.map[item.x] = [];
+          this.map[item.x][item.y] = true;
+        });
+
         this.addNext();
-        //clearInterval(this.interval);
+        clearInterval(this.interval);
       }
     }
 
