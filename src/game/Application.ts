@@ -1,25 +1,22 @@
-import * as PIXI from 'pixi.js'
-import {FIGURES_MAP, STEP_DELAY} from "./config";
+import * as PIXI from 'pixi.js';
+import {BRICK_WIDTH, COORDINATE, FIGURE, FIGURES_MAP, HEIGHT, STEP_DELAY, WIDTH} from "./config";
 import {BaseFigure} from "./BaseFigure";
 
 export class Application {
 
-    stage = null;
-    t = null;
+    currentFigure:BaseFigure;
+    mainContainer:PIXI.Container;
 
     constructor(stage) {
-        this.stage = stage;
+        this.mainContainer = new PIXI.Container();
+        stage.addChild(this.mainContainer);
     }
 
     start() {
-        this.t = new PIXI.Text("hello", {color: "#ff000"});
-        this.stage.addChild(this.t);
+        this.addNextFigure();
 
         this.step = this.step.bind(this);
         this.step();
-
-
-        new BaseFigure(FIGURES_MAP[0]);
     }
 
     step() {
@@ -27,7 +24,26 @@ export class Application {
             requestAnimationFrame(this.step);
         }, STEP_DELAY);
 
-        this.t.position.y += 10;
+        // Figure should be inside mainContainer
+        // Check moving down
+        const coords = this.currentFigure.getCoordsIfMove(0, 1);
+        if (!coords.some((coords:COORDINATE) => coords.x < 0 || coords.x >= WIDTH * BRICK_WIDTH || coords.y >= HEIGHT * BRICK_WIDTH)) {
+            this.currentFigure.position.y += BRICK_WIDTH;
+        } else {
+            this.addNextFigure();
+        }
+
+
+        //this.mainContainer.children
     }
 
+    protected getRandomFigure():FIGURE {
+        const index = Math.floor(Math.random() * FIGURES_MAP.length);
+        return FIGURES_MAP[index];
+    }
+
+    protected addNextFigure() {
+        this.currentFigure = new BaseFigure(this.getRandomFigure());
+        this.mainContainer.addChild(this.currentFigure);
+    }
 }

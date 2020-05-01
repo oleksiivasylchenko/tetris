@@ -4,18 +4,18 @@ export type COORDINATE = {
     y: number
 };
 
-export type FIGURE_CONFIG = {
+export type FIGURE = {
     coords: COORDINATE[],
     color: number
 };
 
-export const STEP = 16;
+export const BRICK_WIDTH = 16;
 export const WIDTH = 10;
 export const HEIGHT = 20;
 
-export const STEP_DELAY = 1000;
+export const STEP_DELAY = 500;
 
-export const FIGURES_MAP:FIGURE_CONFIG[] = [
+export const FIGURES_MAP:FIGURE[] = [
     {
         coords: [
             {x: 0,y: 0},
