@@ -1,13 +1,13 @@
 module.exports = (env) => ({
   entry: {
-    tetris: ['babel-polyfill', 'whatwg-fetch', __dirname + '/src/index.js'],
+    tetris: ['babel-polyfill', 'whatwg-fetch', __dirname + '/src/index.ts'],
   },
   output: {
     path: __dirname + '/build/',
     publicPath: '/',
     filename: 'assets/index.js',
   },
-
+  devtool: 'inline-source-map',
   devServer: {
     contentBase: env ? __dirname + "/build/" : null,
     historyApiFallback: true,
@@ -16,6 +16,7 @@ module.exports = (env) => ({
     }
   },
   resolve: {
+    extensions: [ '.tsx', '.ts', '.js' ],
     alias: {
       libs: __dirname + '/src/libs',
     }
@@ -23,16 +24,15 @@ module.exports = (env) => ({
   module: {
     rules: [
       {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      },
+      {
         test: /\.m?js$/,
         exclude: /node_modules/,
         loader: "babel-loader",
       },
-      /*{
-        test: /\.m?js$/,
-        exclude: /node_modules/,
-        loader: "eslint-loader",
-        enforce: "pre",
-      },*/
       {
         test: /\.css$/,
         include: [

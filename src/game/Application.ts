@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js'
-import {STEP_DELAY} from "../config";
+import {FIGURES_MAP, STEP_DELAY} from "./config";
+import {BaseFigure} from "./BaseFigure";
 
 export class Application {
 
@@ -16,6 +17,9 @@ export class Application {
 
         this.step = this.step.bind(this);
         this.step();
+
+
+        new BaseFigure(FIGURES_MAP[0]);
     }
 
     step() {
