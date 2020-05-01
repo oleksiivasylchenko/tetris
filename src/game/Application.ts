@@ -32,12 +32,15 @@ export class Application {
             }, STEP_DELAY);
         }
 
-        if (this.isNextPosition(offsetX, offsetY)) {
-            this.moveFigureToStage();
-            this.addNextFigure();
-        } else {
-            this.currentFigure.position.x += BRICK_WIDTH * offsetX;
-            this.currentFigure.position.y += BRICK_WIDTH * offsetY;
+        if (!this.isEdgePosition(offsetX, offsetY)) {
+
+            if (this.isFinalPosition(offsetX, offsetY)) {
+                this.moveFigureToStage();
+                this.addNextFigure();
+            } else {
+                this.currentFigure.position.x += BRICK_WIDTH * offsetX;
+                this.currentFigure.position.y += BRICK_WIDTH * offsetY;
+            }
         }
     }
 
@@ -51,8 +54,7 @@ export class Application {
         this.tempContainer.addChild(this.currentFigure);
     }
 
-    protected isNextPosition(offsetX:OFFSET_X, offsetY:OFFSET_Y) {
-        // Check moving down
+    protected isFinalPosition(offsetX:OFFSET_X, offsetY:OFFSET_Y) {
         const coords = this.currentFigure.getCoordsIfMove(offsetX, offsetY);
 
         return coords.some((c:COORDINATE) => {
@@ -66,8 +68,14 @@ export class Application {
         })
     }
 
+    protected isEdgePosition(offsetX:OFFSET_X, offsetY:OFFSET_Y) {
+        const coords = this.currentFigure.getCoordsIfMove(offsetX, offsetY);
+        return coords.some((brick:COORDINATE) => brick.x < 0 || brick.x >= WIDTH * BRICK_WIDTH);
+    }
+
+
     protected isOutsideScene(brick:COORDINATE) {
-        return brick.x < 0 || brick.x >= WIDTH * BRICK_WIDTH || brick.y >= HEIGHT * BRICK_WIDTH;
+        return brick.y >= HEIGHT * BRICK_WIDTH;
     }
 
     protected isOverlap(brick:COORDINATE) {
@@ -84,13 +92,12 @@ export class Application {
     }
 
     protected onKeyDown(event) {
-        const me = this;
         if (event.code === 'ArrowDown') {
-            requestAnimationFrame(() => me.step(0, 1, true));
+            requestAnimationFrame(() => this.step(0, 1, true));
         } else if (event.code === 'ArrowRight') {
-            requestAnimationFrame(() => me.step(1, 0, true));
+            requestAnimationFrame(() => this.step(1, 0, true));
         } else if (event.code === 'ArrowLeft') {
-            requestAnimationFrame(() => me.step(-1, 0, true));
+            requestAnimationFrame(() => this.step(-1, 0, true));
         }
     }
 }
