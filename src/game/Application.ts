@@ -5,11 +5,15 @@ import {BaseFigure} from "./BaseFigure";
 export class Application {
 
     currentFigure:BaseFigure;
-    mainContainer:PIXI.Container;
+    stageContainer:PIXI.Container;
+    tempContainer:PIXI.Container;
 
     constructor(stage) {
-        this.mainContainer = new PIXI.Container();
-        stage.addChild(this.mainContainer);
+        this.stageContainer = new PIXI.Container();
+        this.tempContainer = new PIXI.Container();
+
+        stage.addChild(this.stageContainer);
+        stage.addChild(this.tempContainer);
     }
 
     start() {
@@ -24,17 +28,13 @@ export class Application {
             requestAnimationFrame(this.step);
         }, STEP_DELAY);
 
-        // Figure should be inside mainContainer
-        // Check moving down
-        const coords = this.currentFigure.getCoordsIfMove(0, 1);
-        if (!coords.some((coords:COORDINATE) => coords.x < 0 || coords.x >= WIDTH * BRICK_WIDTH || coords.y >= HEIGHT * BRICK_WIDTH)) {
-            this.currentFigure.position.y += BRICK_WIDTH;
-        } else {
+        if (this.isNextPosition()) {
+            this.moveFigureToStage();
             this.addNextFigure();
+        } else {
+            this.currentFigure.position.y += BRICK_WIDTH;
+
         }
-
-
-        //this.mainContainer.children
     }
 
     protected getRandomFigure():FIGURE {
@@ -44,6 +44,38 @@ export class Application {
 
     protected addNextFigure() {
         this.currentFigure = new BaseFigure(this.getRandomFigure());
-        this.mainContainer.addChild(this.currentFigure);
+        this.tempContainer.addChild(this.currentFigure);
+    }
+
+    protected isNextPosition() {
+        // Check moving down
+        const coords = this.currentFigure.getCoordsIfMove(0, 1);
+
+        return coords.some((c:COORDINATE) => {
+            // Figure should be inside mainContainer
+            // Figure should not overlap another one
+            if (this.isOutsideScene(c) || this.isOverlap(c)) {
+                return true;
+            }
+
+            return false;
+        })
+    }
+
+    protected isOutsideScene(brick:COORDINATE) {
+        return brick.x < 0 || brick.x >= WIDTH * BRICK_WIDTH || brick.y >= HEIGHT * BRICK_WIDTH;
+    }
+
+    protected isOverlap(brick:COORDINATE) {
+        return this.stageContainer.children
+            .some(c => c.position.x == brick.x && c.position.y == brick.y);
+    }
+
+    protected moveFigureToStage() {
+        this.currentFigure.children.forEach(brick => {
+            const position = brick.getGlobalPosition();
+            this.stageContainer.addChild(brick);
+            brick.position = position;
+        });
     }
 }
