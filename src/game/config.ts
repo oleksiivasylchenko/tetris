@@ -9,6 +9,9 @@ export type FIGURE = {
     color: number
 };
 
+export type OFFSET_X = -1|0|1;
+export type OFFSET_Y = 0|1;
+
 export const BRICK_WIDTH = 16;
 export const WIDTH = 10;
 export const HEIGHT = 20;

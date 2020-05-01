@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js';
-import {BRICK_WIDTH, COORDINATE, FIGURE, FIGURES_MAP, HEIGHT, STEP_DELAY, WIDTH} from "./config";
+import {BRICK_WIDTH, COORDINATE, FIGURE, FIGURES_MAP, HEIGHT, OFFSET_X, OFFSET_Y, STEP_DELAY, WIDTH} from "./config";
 import {BaseFigure} from "./BaseFigure";
 
 export class Application {
@@ -17,23 +17,27 @@ export class Application {
     }
 
     start() {
+        window.document.addEventListener('keyup', this.onKeyDown.bind(this));
+
         this.addNextFigure();
 
         this.step = this.step.bind(this);
         this.step();
     }
 
-    step() {
-        setTimeout(() => {
-            requestAnimationFrame(this.step);
-        }, STEP_DELAY);
+    step(offsetX:OFFSET_X = 0, offsetY:OFFSET_Y = 1, userAction:boolean = false) {
+        if (!userAction) {
+            setTimeout(() => {
+                requestAnimationFrame(() => this.step());
+            }, STEP_DELAY);
+        }
 
-        if (this.isNextPosition()) {
+        if (this.isNextPosition(offsetX, offsetY)) {
             this.moveFigureToStage();
             this.addNextFigure();
         } else {
-            this.currentFigure.position.y += BRICK_WIDTH;
-
+            this.currentFigure.position.x += BRICK_WIDTH * offsetX;
+            this.currentFigure.position.y += BRICK_WIDTH * offsetY;
         }
     }
 
@@ -47,9 +51,9 @@ export class Application {
         this.tempContainer.addChild(this.currentFigure);
     }
 
-    protected isNextPosition() {
+    protected isNextPosition(offsetX:OFFSET_X, offsetY:OFFSET_Y) {
         // Check moving down
-        const coords = this.currentFigure.getCoordsIfMove(0, 1);
+        const coords = this.currentFigure.getCoordsIfMove(offsetX, offsetY);
 
         return coords.some((c:COORDINATE) => {
             // Figure should be inside mainContainer
@@ -77,5 +81,16 @@ export class Application {
             this.stageContainer.addChild(brick);
             brick.position = position;
         });
+    }
+
+    protected onKeyDown(event) {
+        const me = this;
+        if (event.code === 'ArrowDown') {
+            requestAnimationFrame(() => me.step(0, 1, true));
+        } else if (event.code === 'ArrowRight') {
+            requestAnimationFrame(() => me.step(1, 0, true));
+        } else if (event.code === 'ArrowLeft') {
+            requestAnimationFrame(() => me.step(-1, 0, true));
+        }
     }
 }
