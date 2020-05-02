@@ -1,14 +1,21 @@
 import * as PIXI from 'pixi.js';
-import {BRICK_WIDTH, COORDINATE, FIGURE, FIGURES_MAP, HEIGHT, OFFSET_X, OFFSET_Y, STEP_DELAY, WIDTH} from "./config";
+import {BRICK_WIDTH, FIGURE, FIGURES_MAP, OFFSET_X, OFFSET_Y, WIDTH} from "./config";
 import {BaseFigure} from "./BaseFigure";
+import Model from "./Model";
+import Controller from "./Controller";
+import {isEdgePosition, isFinalPosition} from "./PositionCheker";
 
 export class Application {
 
-    currentFigure:BaseFigure;
+    currentFigure:BaseFigure = null;
     stageContainer:PIXI.Container;
     tempContainer:PIXI.Container;
+    timeStart: number;
+    model: Model = new Model();
+    controller: Controller = new Controller();
 
     constructor(stage) {
+
         this.stageContainer = new PIXI.Container();
         this.tempContainer = new PIXI.Container();
 
@@ -19,29 +26,47 @@ export class Application {
     start() {
         window.document.addEventListener('keyup', this.onKeyDown.bind(this));
 
-        this.addNextFigure();
+        //this.timeStart = new Date().getTime();
+        const fps = 1000 / 2000;
+        setInterval(() => requestAnimationFrame(this.ticker), fps);
 
-        this.step = this.step.bind(this);
-        this.step();
+        this.moveFigureToStage = this.moveFigureToStage.bind(this);
+    }
+
+    ticker = (timeEnd:number) => {
+        if (!this.timeStart) this.timeStart = timeEnd;
+        const progress = timeEnd - this.timeStart;
+
+        this.checkPosition();
+        if (progress >= 1000) {
+            if (this.step()) {
+                delete this.timeStart;
+            }
+        }
+    };
+
+    checkPosition(offsetX:OFFSET_X = 0, offsetY:OFFSET_Y = 1, userAction:boolean = false) {
+        if (this.currentFigure === null) {
+            this.addNextFigure();
+        }
+
+        if (!isEdgePosition(this.currentFigure, offsetX, offsetY)) {
+            if (isFinalPosition(this.stageContainer, this.currentFigure, offsetX, offsetY)) {
+                this.moveFigureToStage();
+            }
+        }
+
+        this.removeFullLines();
     }
 
     step(offsetX:OFFSET_X = 0, offsetY:OFFSET_Y = 1, userAction:boolean = false) {
-        if (!userAction) {
-            setTimeout(() => {
-                requestAnimationFrame(() => this.step());
-            }, STEP_DELAY);
+        if (!isEdgePosition(this.currentFigure, offsetX, offsetY) && !isFinalPosition(this.stageContainer, this.currentFigure, offsetX, offsetY)) {
+            this.currentFigure.position.x += BRICK_WIDTH * offsetX;
+            this.currentFigure.position.y += BRICK_WIDTH * offsetY;
+            return true;
         }
 
-        if (!this.isEdgePosition(offsetX, offsetY)) {
-
-            if (this.isFinalPosition(offsetX, offsetY)) {
-                this.moveFigureToStage();
-                this.addNextFigure();
-            } else {
-                this.currentFigure.position.x += BRICK_WIDTH * offsetX;
-                this.currentFigure.position.y += BRICK_WIDTH * offsetY;
-            }
-        }
+        return false;
     }
 
     protected getRandomFigure():FIGURE {
@@ -54,41 +79,17 @@ export class Application {
         this.tempContainer.addChild(this.currentFigure);
     }
 
-    protected isFinalPosition(offsetX:OFFSET_X, offsetY:OFFSET_Y) {
-        const coords = this.currentFigure.getCoordsIfMove(offsetX, offsetY);
-
-        return coords.some((c:COORDINATE) => {
-            // Figure should be inside mainContainer
-            // Figure should not overlap another one
-            if (this.isOutsideScene(c) || this.isOverlap(c)) {
-                return true;
-            }
-
-            return false;
-        })
-    }
-
-    protected isEdgePosition(offsetX:OFFSET_X, offsetY:OFFSET_Y) {
-        const coords = this.currentFigure.getCoordsIfMove(offsetX, offsetY);
-        return coords.some((brick:COORDINATE) => brick.x < 0 || brick.x >= WIDTH * BRICK_WIDTH);
-    }
-
-
-    protected isOutsideScene(brick:COORDINATE) {
-        return brick.y >= HEIGHT * BRICK_WIDTH;
-    }
-
-    protected isOverlap(brick:COORDINATE) {
-        return this.stageContainer.children
-            .some(c => c.position.x == brick.x && c.position.y == brick.y);
-    }
-
     protected moveFigureToStage() {
-        this.currentFigure.children.forEach(brick => {
-            const position = brick.getGlobalPosition();
-            this.stageContainer.addChild(brick);
-            brick.position = position;
+        this.currentFigure.children.forEach(b => {
+            const position = b.getGlobalPosition();
+            this.stageContainer.addChild(b);
+            b.position = position;
+            console.log(b, 'MOVE');
         });
+
+        if (!this.currentFigure.children.length) {
+            this.currentFigure = null;
+        }
     }
 
     protected onKeyDown(event) {
@@ -99,5 +100,36 @@ export class Application {
         } else if (event.code === 'ArrowLeft') {
             requestAnimationFrame(() => this.step(-1, 0, true));
         }
+    }
+
+    protected removeFullLines() {
+        const bricksPerLineMap = this.stageContainer.children.reduce((res:any, brick:PIXI.Container) => {
+            if (res[brick.position.y]) {
+                res[brick.position.y]++;
+            } else {
+                res[brick.position.y] = 1;
+            }
+
+            return res;
+        }, {});
+
+
+        //console.log(bricksPerLineMap, 'bricksPerLineMap');
+
+        const fullLines = Object.keys(bricksPerLineMap).reduce((fullLines, key) => {
+            if (bricksPerLineMap[key] === WIDTH) {
+                fullLines.push(+key);
+            }
+
+            return fullLines;
+        }, []);
+
+        fullLines.length && this.stageContainer.children.forEach((brick:PIXI.Container) => {
+
+            console.log(fullLines, brick.getGlobalPosition().y);
+            if (fullLines.includes(brick.getGlobalPosition().y)) {
+                this.stageContainer.removeChild(brick);
+            }
+        });
     }
 }
