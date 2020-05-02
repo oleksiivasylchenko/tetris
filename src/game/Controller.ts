@@ -1,13 +1,22 @@
 import {FIGURE, FIGURES_MAP, WIDTH} from "./config";
 import * as PIXI from "pixi.js";
 import {BaseFigure} from "./BaseFigure";
+import GraphicController from './GraphicController';
+import Model from "./Model";
 
 export default class Controller {
 
     protected stageContainer:PIXI.Container;
+    protected model: Model;
 
-    constructor(stageContainer:PIXI.Container) {
+    constructor(stageContainer:PIXI.Container, model:Model) {
         this.stageContainer = stageContainer;
+        this.model = model;
+    }
+
+    processOperation() {
+        const f = this.model.getOperation();
+        f();
     }
 
     getRandomFigure() {
@@ -18,6 +27,17 @@ export default class Controller {
         const bricksPerLineMap = this.getBricksPerLine();
 
         return Controller.getFullLines(bricksPerLineMap);
+    }
+
+    moveToMainLayer(figure:BaseFigure, finalAction) {
+        figure.children.forEach((b:PIXI.Container, index) => {
+            const operation = () => {
+                GraphicController.moveFigureToStage(this.stageContainer, b);
+                (index === figure.children.length - 1) && finalAction();
+            };
+
+            this.model.addOperation(operation);
+        });
     }
 
     protected getBricksPerLine() {

@@ -22,6 +22,7 @@ export default class {
                 fullLines[y]--;
 
                 if (fullLines[y] === 0) {
+                    this.model.addEmptyLine(y);
                     delete fullLines[y];
                 }
 
@@ -30,11 +31,29 @@ export default class {
         });
     }
 
-    moveFigureToStage() {
-        this.model.getCurrentFigure().children.forEach(b => {
-            const position = b.getGlobalPosition();
-            this.stageContainer.addChild(b);
-            b.position = position;
-        });
+    static moveFigureToStage(stageContainer:PIXI.Container, b:PIXI.Container) {
+        const position = b.getGlobalPosition();
+        stageContainer.addChild(b);
+        b.position = position;
+    }
+
+    fillEmptyLines() {
+        if (this.model.getEmptyLines().size) {
+            const lineIndexes = Array.from(this.model.getEmptyLines());
+            const maxIndex = Math.max(...lineIndexes);
+            console.log(maxIndex, 'maxIndex');
+
+            const bricksUpper = this.stageContainer.children.filter((brick:PIXI.Container) => brick.getGlobalPosition().y < maxIndex);
+
+            console.log(bricksUpper.length, 'bricksUpper.length');
+            if (bricksUpper.length) {
+                bricksUpper.map((brick:PIXI.Container) => {
+                    brick.position.y++;
+                });
+            } else {
+                this.model.removeEmptyLine(maxIndex);
+            }
+        }
+
     }
 }

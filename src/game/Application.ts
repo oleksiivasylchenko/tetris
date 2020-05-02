@@ -21,7 +21,7 @@ export class Application {
         this.stageContainer = new PIXI.Container();
         this.tempContainer = new PIXI.Container();
 
-        this.controller = new Controller(this.stageContainer);
+        this.controller = new Controller(this.stageContainer, this.model);
         this.graphController = new GraphicController(this.stageContainer, this.model);
 
         stage.addChild(this.stageContainer);
@@ -40,19 +40,28 @@ export class Application {
         if (!this.timeStart) this.timeStart = timeEnd;
         const progress = timeEnd - this.timeStart;
 
-        if (this.model.isMode(MODE.removeFullLines)) {
+        if (this.model.hasOperation()) {
+            this.controller.processOperation();
+        } else if (this.model.isMode(MODE.removeFullLines)) {
             this.graphController.moveFigureToContainer();
 
             if (!Object.keys(this.model.getFullLines()).length) {
-                this.model.setMode(MODE.idle);
+                this.model.setNextMode();
             }
-        } else if (this.model.isMode(MODE.moveToMainLayer)) {
+        } else if (this.model.isMode(MODE.fillEmptyLines)) {
+            this.graphController.fillEmptyLines();
+
+            if (!this.model.getEmptyLines().size) {
+                console.log('NEXT!!!');
+                this.model.setNextMode();
+            }
+        /*} else if (this.model.isMode(MODE.moveToMainLayer)) {
             this.graphController.moveFigureToStage();
 
             if (!this.model.getCurrentFigure().children.length) {
-                this.model.setMode(MODE.idle);
+                this.model.setNextMode();
                 this.currentFigure = null;
-            }
+            }*/
         } else {
             this.checkPosition();
 
@@ -64,20 +73,21 @@ export class Application {
         }
     };
 
-    checkPosition(offsetX:OFFSET_X = 0, offsetY:OFFSET_Y = 1, userAction:boolean = false) {
+    checkPosition(offsetX:OFFSET_X = 0, offsetY:OFFSET_Y = 1) {
         if (this.currentFigure === null) {
             this.addNextFigure();
         }
 
         if (!isEdgePosition(this.currentFigure, offsetX, offsetY)) {
             if (isFinalPosition(this.stageContainer, this.currentFigure, offsetX, offsetY)) {
-                this.model.setMode(MODE.moveToMainLayer);
-                this.model.setCurrentFigure(this.currentFigure);
+                this.controller.moveToMainLayer(this.currentFigure, () => {
+                    this.currentFigure = null;
+                });
             }
         }
     }
 
-    step(offsetX:OFFSET_X = 0, offsetY:OFFSET_Y = 1, userAction:boolean = false) {
+    step(offsetX:OFFSET_X = 0, offsetY:OFFSET_Y = 1) {
         if (!isEdgePosition(this.currentFigure, offsetX, offsetY) && !isFinalPosition(this.stageContainer, this.currentFigure, offsetX, offsetY)) {
             this.currentFigure.position.x += BRICK_WIDTH * offsetX;
             this.currentFigure.position.y += BRICK_WIDTH * offsetY;
@@ -94,11 +104,11 @@ export class Application {
 
     protected onKeyDown(event) {
         if (event.code === 'ArrowDown') {
-            requestAnimationFrame(() => this.step(0, 1, true));
+            requestAnimationFrame(() => this.step(0, 1));
         } else if (event.code === 'ArrowRight') {
-            requestAnimationFrame(() => this.step(1, 0, true));
+            requestAnimationFrame(() => this.step(1, 0));
         } else if (event.code === 'ArrowLeft') {
-            requestAnimationFrame(() => this.step(-1, 0, true));
+            requestAnimationFrame(() => this.step(-1, 0));
         }
     }
 
@@ -107,7 +117,7 @@ export class Application {
         const fullLines = this.controller.getFullLines();
 
         if (Object.keys(fullLines).length) {
-            this.model.setMode(MODE.removeFullLines);
+            this.model.setMode(MODE.removeFullLines, MODE.fillEmptyLines);
             this.model.setFullLines(fullLines);
         }
     }
