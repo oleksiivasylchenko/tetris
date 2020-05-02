@@ -1,9 +1,10 @@
 import * as PIXI from 'pixi.js';
-import {BRICK_WIDTH, FIGURE, FIGURES_MAP, OFFSET_X, OFFSET_Y, WIDTH} from "./config";
+import {BRICK_WIDTH, FIGURE, FIGURES_MAP, OFFSET_X, OFFSET_Y, STEP_DELAY} from "./config";
 import {BaseFigure} from "./BaseFigure";
-import Model from "./Model";
+import Model, {MODE} from "./Model";
 import Controller from "./Controller";
-import {isEdgePosition, isFinalPosition} from "./PositionCheker";
+import {isEdgePosition, isFinalPosition} from "./PositionChecker";
+import GraphicController from "./GraphicController";
 
 export class Application {
 
@@ -12,12 +13,16 @@ export class Application {
     tempContainer:PIXI.Container;
     timeStart: number;
     model: Model = new Model();
-    controller: Controller = new Controller();
+    controller: Controller;
+    graphController: GraphicController;
 
     constructor(stage) {
 
         this.stageContainer = new PIXI.Container();
         this.tempContainer = new PIXI.Container();
+
+        this.controller = new Controller(this.stageContainer);
+        this.graphController = new GraphicController(this.stageContainer, this.model);
 
         stage.addChild(this.stageContainer);
         stage.addChild(this.tempContainer);
@@ -29,19 +34,33 @@ export class Application {
         //this.timeStart = new Date().getTime();
         const fps = 1000 / 2000;
         setInterval(() => requestAnimationFrame(this.ticker), fps);
-
-        this.moveFigureToStage = this.moveFigureToStage.bind(this);
     }
 
     ticker = (timeEnd:number) => {
         if (!this.timeStart) this.timeStart = timeEnd;
         const progress = timeEnd - this.timeStart;
 
-        this.checkPosition();
-        if (progress >= 1000) {
-            if (this.step()) {
+        if (this.model.isMode(MODE.removeFullLines)) {
+            this.graphController.moveFigureToContainer();
+
+            if (!Object.keys(this.model.getFullLines()).length) {
+                this.model.setMode(MODE.idle);
+            }
+        } else if (this.model.isMode(MODE.moveToMainLayer)) {
+            this.graphController.moveFigureToStage();
+
+            if (!this.model.getCurrentFigure().children.length) {
+                this.model.setMode(MODE.idle);
+                this.currentFigure = null;
+            }
+        } else {
+            this.checkPosition();
+
+            if (progress >= STEP_DELAY && this.step()) {
                 delete this.timeStart;
             }
+
+            this.checkFullLines();
         }
     };
 
@@ -52,11 +71,10 @@ export class Application {
 
         if (!isEdgePosition(this.currentFigure, offsetX, offsetY)) {
             if (isFinalPosition(this.stageContainer, this.currentFigure, offsetX, offsetY)) {
-                this.moveFigureToStage();
+                this.model.setMode(MODE.moveToMainLayer);
+                this.model.setCurrentFigure(this.currentFigure);
             }
         }
-
-        this.removeFullLines();
     }
 
     step(offsetX:OFFSET_X = 0, offsetY:OFFSET_Y = 1, userAction:boolean = false) {
@@ -69,27 +87,9 @@ export class Application {
         return false;
     }
 
-    protected getRandomFigure():FIGURE {
-        const index = Math.floor(Math.random() * FIGURES_MAP.length);
-        return FIGURES_MAP[index];
-    }
-
     protected addNextFigure() {
-        this.currentFigure = new BaseFigure(this.getRandomFigure());
+        this.currentFigure = this.controller.getRandomFigure();
         this.tempContainer.addChild(this.currentFigure);
-    }
-
-    protected moveFigureToStage() {
-        this.currentFigure.children.forEach(b => {
-            const position = b.getGlobalPosition();
-            this.stageContainer.addChild(b);
-            b.position = position;
-            console.log(b, 'MOVE');
-        });
-
-        if (!this.currentFigure.children.length) {
-            this.currentFigure = null;
-        }
     }
 
     protected onKeyDown(event) {
@@ -102,34 +102,13 @@ export class Application {
         }
     }
 
-    protected removeFullLines() {
-        const bricksPerLineMap = this.stageContainer.children.reduce((res:any, brick:PIXI.Container) => {
-            if (res[brick.position.y]) {
-                res[brick.position.y]++;
-            } else {
-                res[brick.position.y] = 1;
-            }
+    protected checkFullLines() {
 
-            return res;
-        }, {});
+        const fullLines = this.controller.getFullLines();
 
-
-        //console.log(bricksPerLineMap, 'bricksPerLineMap');
-
-        const fullLines = Object.keys(bricksPerLineMap).reduce((fullLines, key) => {
-            if (bricksPerLineMap[key] === WIDTH) {
-                fullLines.push(+key);
-            }
-
-            return fullLines;
-        }, []);
-
-        fullLines.length && this.stageContainer.children.forEach((brick:PIXI.Container) => {
-
-            console.log(fullLines, brick.getGlobalPosition().y);
-            if (fullLines.includes(brick.getGlobalPosition().y)) {
-                this.stageContainer.removeChild(brick);
-            }
-        });
+        if (Object.keys(fullLines).length) {
+            this.model.setMode(MODE.removeFullLines);
+            this.model.setFullLines(fullLines);
+        }
     }
 }
