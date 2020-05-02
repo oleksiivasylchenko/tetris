@@ -32,11 +32,29 @@ export default class Controller {
     moveToMainLayer(figure:BaseFigure, finalAction) {
         figure.children.forEach((b:PIXI.Container, index) => {
             const operation = () => {
-                GraphicController.moveFigureToStage(this.stageContainer, b);
+                const position = b.getGlobalPosition();
+                this.stageContainer.addChild(b);
+                b.position = position;
+
+                // Final action
                 (index === figure.children.length - 1) && finalAction();
             };
 
             this.model.addOperation(operation);
+        });
+    }
+
+    removeFullLines(fullLines:{number:number}) {
+
+        Object.keys(fullLines) && this.stageContainer.children.forEach((brick:PIXI.Container) => {
+
+            if (Object.keys(fullLines).includes('' + brick.getGlobalPosition().y)) {
+                const operation = () => {
+                    this.stageContainer.removeChild(brick);
+                };
+
+                this.model.addOperation(operation);
+            }
         });
     }
 

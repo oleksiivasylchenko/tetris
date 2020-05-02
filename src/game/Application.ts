@@ -42,12 +42,6 @@ export class Application {
 
         if (this.model.hasOperation()) {
             this.controller.processOperation();
-        } else if (this.model.isMode(MODE.removeFullLines)) {
-            this.graphController.moveFigureToContainer();
-
-            if (!Object.keys(this.model.getFullLines()).length) {
-                this.model.setNextMode();
-            }
         } else if (this.model.isMode(MODE.fillEmptyLines)) {
             this.graphController.fillEmptyLines();
 
@@ -55,13 +49,6 @@ export class Application {
                 console.log('NEXT!!!');
                 this.model.setNextMode();
             }
-        /*} else if (this.model.isMode(MODE.moveToMainLayer)) {
-            this.graphController.moveFigureToStage();
-
-            if (!this.model.getCurrentFigure().children.length) {
-                this.model.setNextMode();
-                this.currentFigure = null;
-            }*/
         } else {
             this.checkPosition();
 
@@ -117,8 +104,7 @@ export class Application {
         const fullLines = this.controller.getFullLines();
 
         if (Object.keys(fullLines).length) {
-            this.model.setMode(MODE.removeFullLines, MODE.fillEmptyLines);
-            this.model.setFullLines(fullLines);
+            this.controller.removeFullLines(fullLines);
         }
     }
 }

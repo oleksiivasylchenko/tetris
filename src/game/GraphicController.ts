@@ -11,32 +11,6 @@ export default class {
         this.model = model;
     }
 
-    moveFigureToContainer() {
-        const fullLines = this.model.getFullLines();
-
-        Object.keys(fullLines) && this.stageContainer.children.forEach((brick:PIXI.Container) => {
-
-            if (Object.keys(fullLines).includes('' + brick.getGlobalPosition().y)) {
-                const y = brick.getGlobalPosition().y;
-                this.stageContainer.removeChild(brick);
-                fullLines[y]--;
-
-                if (fullLines[y] === 0) {
-                    this.model.addEmptyLine(y);
-                    delete fullLines[y];
-                }
-
-                this.model.setFullLines(fullLines);
-            }
-        });
-    }
-
-    static moveFigureToStage(stageContainer:PIXI.Container, b:PIXI.Container) {
-        const position = b.getGlobalPosition();
-        stageContainer.addChild(b);
-        b.position = position;
-    }
-
     fillEmptyLines() {
         if (this.model.getEmptyLines().size) {
             const lineIndexes = Array.from(this.model.getEmptyLines());
