@@ -6,6 +6,7 @@ export type COORDINATE = {
 
 export type FIGURE = {
     coords: COORDINATE[],
+    center: COORDINATE,
     color: string
 };
 
@@ -20,39 +21,67 @@ export const STEP_DELAY = 500;
 
 export const FIGURES_MAP:FIGURE[] = [
     {
+        // xx
+        // x
+        // x
         coords: [
             {x: 0,y: 0},
             {x: 1, y: 0},
             {x: 0, y: 1},
             {x: 0, y: 2},
         ],
+        center: {
+            x: 0.5,
+            y: 1.5,
+        },
         color: 'blue',
     },
     {
+        //  x
+        // xxx
+        //
         coords: [
             {x: 1, y: 0},
             {x: 0, y: 1},
             {x: 1, y: 1},
             {x: 2, y: 1},
         ],
+        center: {
+            x: 1.5,
+            y: 1.5,
+        },
         color: 'orange'
     },
     {
+        // x
+        // x
+        // x
+        // x
         coords: [
             {x: 0,y: 0},
             {x: 0, y: 1},
             {x: 0, y: 2},
             {x: 0, y: 3},
         ],
+        center: {
+            x: 0.5,
+            y: 2.5,
+        },
         color: 'green',
     },
     {
+        // xx
+        // xx
         coords: [
             {x: 0,y: 0},
             {x: 0, y: 1},
             {x: 1, y: 0},
             {x: 1, y: 1},
         ],
+        center: {
+            x: 1,
+            y: 1,
+        },
         color: 'yellow',
     },
 ];

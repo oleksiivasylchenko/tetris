@@ -5,8 +5,14 @@ import {ImageFactory} from "./ImageFactory";
 
 export class BaseFigure extends PIXI.Container {
 
+    imageFactory:ImageFactory;
+    config: FIGURE;
+
     constructor(imageFactory:ImageFactory, config:FIGURE) {
         super();
+
+        this.imageFactory = imageFactory;
+        this.config = config;
 
         const {color} = config;
 
@@ -14,7 +20,9 @@ export class BaseFigure extends PIXI.Container {
             this.addChild(new Brick(imageFactory, color, coords));
         });
 
-        this.position.x = Math.floor(WIDTH / 2 - 1) * BRICK_WIDTH;
+        this.pivot.set(this.config.center.x * BRICK_WIDTH, this.config.center.y * BRICK_WIDTH);
+        this.position.x = Math.floor(WIDTH / 2 - 1) * BRICK_WIDTH + this.config.center.x * BRICK_WIDTH;
+        this.position.y = this.config.center.y * BRICK_WIDTH;
     }
 
     // Get coordinates if figure will be moved to offsetX, offsetY
@@ -23,31 +31,35 @@ export class BaseFigure extends PIXI.Container {
             const {x, y} = brick.getGlobalPosition();
 
             return {
-                x: x + offsetX * BRICK_WIDTH,
-                y: y + offsetY * BRICK_WIDTH
+                x: x - this.pivot.x + offsetX * BRICK_WIDTH,
+                y: y - this.pivot.y + offsetY * BRICK_WIDTH
             }
         });
     }
 
+    rotate() {
+        this.rotation += Math.PI / 2; // +90 degrees
+    }
+
     getClone() {
-        /*const clone = new PIXI.Container();
+        const clone = new PIXI.Container();
         this.children.forEach(b => {
             const {x, y} = b.position;
 
-            clone.addChild(new Brick(0xff0000, {
+            clone.addChild(new Brick(this.imageFactory, 'green', {
                 x: x / BRICK_WIDTH,
                 y: y / BRICK_WIDTH,
             }));
         });
 
-        const {x, y} = this.position;
-
-        clone.pivot.set(clone.width / 2, clone.height / 2);
+        clone.position = this.position;
         clone.rotation = Math.PI / 2;
-        clone.position.x = x + clone.width / 2;
-        clone.position.y = y + clone.height / 2;
 
-        return clone;*/
+        clone.pivot.set(this.config.center.x * BRICK_WIDTH, this.config.center.y * BRICK_WIDTH);
+        clone.position.x += this.config.center.x * BRICK_WIDTH;
+        clone.position.y += this.config.center.y * BRICK_WIDTH;
+
+        return clone;
     }
 
 }

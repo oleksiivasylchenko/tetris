@@ -11,17 +11,11 @@ export default class extends PIXI.Sprite {
 
         this.texture = PIXI.Texture.from(image);
 
-        /*const g = new PIXI.Graphics();
-        //this.texture = texture;
-        g.beginFill(color);
-        g.drawRect(0,0, BRICK_WIDTH, BRICK_WIDTH);*/
+        this.pivot.x = BRICK_WIDTH / 2;
+        this.pivot.y = BRICK_WIDTH / 2;
 
-        //this.addChild(g);
-        this.position.x = coords.x * BRICK_WIDTH;
-        this.position.y = coords.y * BRICK_WIDTH;
-
-
-
+        this.position.x = coords.x * BRICK_WIDTH + this.pivot.x;
+        this.position.y = coords.y * BRICK_WIDTH + this.pivot.y;
     }
 
 }

@@ -8,7 +8,8 @@ const isOverlap = (stageContainer:PIXI.Container, brick:COORDINATE) => stageCont
 
 export const isEdgePosition = (currentFigure: BaseFigure, offsetX:OFFSET_X, offsetY:OFFSET_Y) => {
     const coords = currentFigure.getCoordsIfMove(offsetX, offsetY);
-    return coords.some((brick:COORDINATE) => brick.x < 0 || brick.x >= WIDTH * BRICK_WIDTH);
+    const r = coords.some((brick:COORDINATE) => brick.x < 0 || brick.x >= WIDTH * BRICK_WIDTH)
+    return r;
 };
 
 export const isGameOverPosition = (stageContainer:PIXI.Container, currentFigure: BaseFigure, offsetX:OFFSET_X, offsetY:OFFSET_Y) => {
@@ -16,7 +17,14 @@ export const isGameOverPosition = (stageContainer:PIXI.Container, currentFigure:
     return coords.some((c:COORDINATE) => isOverlap(stageContainer, c) && c.y === BRICK_WIDTH);
 };
 
-export const isFinalPosition = (stageContainer:PIXI.Container, currentFigure: BaseFigure, offsetX:OFFSET_X, offsetY:OFFSET_Y) => {
+export const isFinalPosition = (stageContainer:PIXI.Container, currentFigure: BaseFigure, offsetX:OFFSET_X = 0, offsetY:OFFSET_Y = 0) => {
     const coords = currentFigure.getCoordsIfMove(offsetX, offsetY);
     return coords.some((c:COORDINATE) => isOutsideScene(c) || isOverlap(stageContainer, c));
+};
+
+export const canRotate = (stageContainer:PIXI.Container, currentFigure: PIXI.Container) => {
+    return currentFigure.children.every((brick) => {
+        const c = brick.getGlobalPosition();
+        return !isOutsideScene(c) && !isOverlap(stageContainer, c);
+    });
 };

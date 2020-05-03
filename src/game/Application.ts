@@ -3,7 +3,7 @@ import {BRICK_WIDTH, OFFSET_X, OFFSET_Y, STEP_DELAY} from "./config";
 import {BaseFigure} from "./BaseFigure";
 import Model from "./Model";
 import Controller from "./Controller";
-import {isEdgePosition, isFinalPosition, isGameOverPosition} from "./PositionChecker";
+import {canRotate, isEdgePosition, isFinalPosition, isGameOverPosition} from "./PositionChecker";
 import {ImageFactory} from "./ImageFactory";
 
 export class Application {
@@ -92,10 +92,10 @@ export class Application {
 
     protected onKeyDown(event) {
         if (event.code === 'ArrowUp') {
-            /*const clone = this.currentFigure.getClone();
-            console.log(clone.position, 'POSITION');
-            requestAnimationFrame(() => this.stageContainer.addChild(clone));*/
-
+            const cloneFigure = this.currentFigure.getClone();
+            if (canRotate(this.stageContainer, cloneFigure)) {
+                this.controller.addOperation(() => this.currentFigure.rotate());
+            }
         } else if (event.code === 'ArrowDown') {
             this.controller.addOperation(() => this.step(0, 1));
         } else if (event.code === 'ArrowRight') {
