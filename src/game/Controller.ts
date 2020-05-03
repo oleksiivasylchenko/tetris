@@ -1,7 +1,6 @@
 import {BRICK_WIDTH, FIGURE, FIGURES_MAP, WIDTH} from "./config";
 import * as PIXI from "pixi.js";
 import {BaseFigure} from "./BaseFigure";
-import GraphicController from './GraphicController';
 import Model from "./Model";
 
 export default class Controller {
@@ -19,8 +18,12 @@ export default class Controller {
         f();
     }
 
-    getRandomFigure() {
-        return new BaseFigure(this.getRandomFigureIndex());
+    addNextFigure(tempContainer:PIXI.Container, f:Function) {
+        this.model.addOperation(() => {
+            const currentFigure = this.getRandomFigure();
+            tempContainer.addChild(currentFigure);
+            f(currentFigure);
+        });
     }
 
     getFullLines():number[] {
@@ -101,6 +104,10 @@ export default class Controller {
     protected getRandomFigureIndex():FIGURE {
         const index = Math.floor(Math.random() * FIGURES_MAP.length);
         return FIGURES_MAP[index];
+    }
+
+    protected getRandomFigure() {
+        return new BaseFigure(this.getRandomFigureIndex());
     }
 
 }

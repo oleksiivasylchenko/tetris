@@ -11,7 +11,6 @@ export class BaseFigure extends PIXI.Container {
 
         config.coords.forEach((coords:COORDINATE) => {
             this.addChild(new Brick(color, coords));
-
         });
     }
 

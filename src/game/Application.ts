@@ -1,10 +1,9 @@
 import * as PIXI from 'pixi.js';
-import {BRICK_WIDTH, FIGURE, FIGURES_MAP, OFFSET_X, OFFSET_Y, STEP_DELAY} from "./config";
+import {BRICK_WIDTH, OFFSET_X, OFFSET_Y, STEP_DELAY} from "./config";
 import {BaseFigure} from "./BaseFigure";
 import Model from "./Model";
 import Controller from "./Controller";
 import {isEdgePosition, isFinalPosition} from "./PositionChecker";
-import GraphicController from "./GraphicController";
 
 export class Application {
 
@@ -14,7 +13,6 @@ export class Application {
     timeStart: number;
     model: Model = new Model();
     controller: Controller;
-    graphController: GraphicController;
 
     constructor(stage) {
 
@@ -22,7 +20,6 @@ export class Application {
         this.tempContainer = new PIXI.Container();
 
         this.controller = new Controller(this.stageContainer, this.model);
-        this.graphController = new GraphicController(this.stageContainer, this.model);
 
         stage.addChild(this.stageContainer);
         stage.addChild(this.tempContainer);
@@ -40,11 +37,12 @@ export class Application {
         if (!this.timeStart) this.timeStart = timeEnd;
         const progress = timeEnd - this.timeStart;
 
-        this.checkFullLines();
-
         if (this.model.hasOperation()) {
             this.controller.processOperation();
+        } else if(this.currentFigure === null) {
+            this.addNextFigure();
         } else {
+            this.checkFullLines();
             this.checkPosition();
 
             if (progress >= STEP_DELAY && this.step()) {
@@ -54,10 +52,6 @@ export class Application {
     };
 
     checkPosition(offsetX:OFFSET_X = 0, offsetY:OFFSET_Y = 1) {
-        if (this.currentFigure === null) {
-            this.addNextFigure();
-        }
-
         if (!isEdgePosition(this.currentFigure, offsetX, offsetY)) {
             if (isFinalPosition(this.stageContainer, this.currentFigure, offsetX, offsetY)) {
                 this.controller.moveToMainLayer(this.currentFigure, () => {
@@ -78,8 +72,10 @@ export class Application {
     }
 
     protected addNextFigure() {
-        this.currentFigure = this.controller.getRandomFigure();
-        this.tempContainer.addChild(this.currentFigure);
+
+        this.controller.addNextFigure(this.tempContainer, (figure:BaseFigure) => {
+            this.currentFigure = figure;
+        });
     }
 
     protected onKeyDown(event) {
