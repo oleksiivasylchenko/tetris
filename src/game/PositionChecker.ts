@@ -11,6 +11,11 @@ export const isEdgePosition = (currentFigure: BaseFigure, offsetX:OFFSET_X, offs
     return coords.some((brick:COORDINATE) => brick.x < 0 || brick.x >= WIDTH * BRICK_WIDTH);
 };
 
+export const isGameOverPosition = (stageContainer:PIXI.Container, currentFigure: BaseFigure, offsetX:OFFSET_X, offsetY:OFFSET_Y) => {
+    const coords = currentFigure.getCoordsIfMove(offsetX, offsetY);
+    return coords.some((c:COORDINATE) => isOverlap(stageContainer, c) && c.y === BRICK_WIDTH);
+};
+
 export const isFinalPosition = (stageContainer:PIXI.Container, currentFigure: BaseFigure, offsetX:OFFSET_X, offsetY:OFFSET_Y) => {
     const coords = currentFigure.getCoordsIfMove(offsetX, offsetY);
     return coords.some((c:COORDINATE) => isOutsideScene(c) || isOverlap(stageContainer, c));

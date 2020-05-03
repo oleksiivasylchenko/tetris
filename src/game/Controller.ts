@@ -77,6 +77,13 @@ export default class Controller {
 
     }
 
+    gameOver() {
+        const t = new PIXI.Text('Game Over');
+        t.position.x = 10;
+        t.position.y = 20;
+        this.stageContainer.addChild(t);
+    }
+
     protected getBricksPerLine() {
         return this.stageContainer.children
             .reduce((res:any, brick:PIXI.Container) => {

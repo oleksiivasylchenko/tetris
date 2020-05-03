@@ -3,7 +3,7 @@ import {BRICK_WIDTH, OFFSET_X, OFFSET_Y, STEP_DELAY} from "./config";
 import {BaseFigure} from "./BaseFigure";
 import Model from "./Model";
 import Controller from "./Controller";
-import {isEdgePosition, isFinalPosition} from "./PositionChecker";
+import {isEdgePosition, isFinalPosition, isGameOverPosition} from "./PositionChecker";
 
 export class Application {
 
@@ -13,6 +13,7 @@ export class Application {
     timeStart: number;
     model: Model = new Model();
     controller: Controller;
+    tickerIdentificator: NodeJS.Timeout;
 
     constructor(stage) {
 
@@ -21,8 +22,8 @@ export class Application {
 
         this.controller = new Controller(this.stageContainer, this.model);
 
-        stage.addChild(this.stageContainer);
         stage.addChild(this.tempContainer);
+        stage.addChild(this.stageContainer);
     }
 
     start() {
@@ -30,7 +31,7 @@ export class Application {
 
         //this.timeStart = new Date().getTime();
         const fps = 1000 / 2000;
-        setInterval(() => requestAnimationFrame(this.ticker), fps);
+        this.tickerIdentificator = setInterval(() => requestAnimationFrame(this.ticker), fps);
     }
 
     ticker = (timeEnd:number) => {
@@ -54,9 +55,15 @@ export class Application {
     checkPosition(offsetX:OFFSET_X = 0, offsetY:OFFSET_Y = 1) {
         if (!isEdgePosition(this.currentFigure, offsetX, offsetY)) {
             if (isFinalPosition(this.stageContainer, this.currentFigure, offsetX, offsetY)) {
-                this.controller.moveToMainLayer(this.currentFigure, () => {
-                    this.currentFigure = null;
-                });
+                if (isGameOverPosition(this.stageContainer, this.currentFigure, offsetX, offsetY)) {
+                    clearInterval(this.tickerIdentificator);
+                    this.controller.gameOver();
+                } else {
+                    this.controller.moveToMainLayer(this.currentFigure, () => {
+                        this.currentFigure = null;
+                    });
+                }
+
             }
         }
     }
