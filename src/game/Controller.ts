@@ -1,4 +1,4 @@
-import {BRICK_WIDTH, FIGURE, FIGURES_MAP, WIDTH} from "./config";
+import {BRICK_WIDTH, FIGURE, FIGURES_MAP, OFFSET_X, OFFSET_Y, WIDTH} from "./config";
 import * as PIXI from "pixi.js";
 import {BaseFigure} from "./BaseFigure";
 import Model from "./Model";
@@ -19,7 +19,7 @@ export default class Controller {
     }
 
     addNextFigure(tempContainer:PIXI.Container, f:Function) {
-        this.model.addOperation(() => {
+        this.addOperation(() => {
             const currentFigure = this.getRandomFigure();
             tempContainer.addChild(currentFigure);
             f(currentFigure);
@@ -43,7 +43,7 @@ export default class Controller {
                 (index === figure.children.length - 1) && finalAction();
             };
 
-            this.model.addOperation(operation);
+            this.addOperation(operation);
         });
     }
 
@@ -56,7 +56,7 @@ export default class Controller {
                     this.stageContainer.removeChild(brick);
                 };
 
-                this.model.addOperation(operation);
+                this.addOperation(operation);
             }
         });
     }
@@ -68,13 +68,17 @@ export default class Controller {
 
             if (bricksUpper.length) {
                 bricksUpper.map((brick:PIXI.Container) => {
-                    this.model.addOperation(() => {
+                    this.addOperation(() => {
                         brick.position.y += BRICK_WIDTH;
                     });
                 });
             }
         });
 
+    }
+
+    addOperation(f:Function) {
+        this.model.addOperation(f);
     }
 
     gameOver() {

@@ -87,11 +87,11 @@ export class Application {
 
     protected onKeyDown(event) {
         if (event.code === 'ArrowDown') {
-            requestAnimationFrame(() => this.step(0, 1));
+            this.controller.addOperation(() => this.step(0, 1));
         } else if (event.code === 'ArrowRight') {
-            requestAnimationFrame(() => this.step(1, 0));
+            this.controller.addOperation(() => this.step(1, 0));
         } else if (event.code === 'ArrowLeft') {
-            requestAnimationFrame(() => this.step(-1, 0));
+            this.controller.addOperation(() => this.step(-1, 0));
         }
     }
 
