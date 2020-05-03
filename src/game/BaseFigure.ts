@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js';
-import {BRICK_WIDTH, COORDINATE, FIGURE, OFFSET_X, OFFSET_Y} from "./config";
+import {BRICK_WIDTH, COORDINATE, FIGURE, HEIGHT, OFFSET_X, OFFSET_Y, WIDTH} from "./config";
 import Brick from "./Brick";
 
 export class BaseFigure extends PIXI.Container {
@@ -12,6 +12,8 @@ export class BaseFigure extends PIXI.Container {
         config.coords.forEach((coords:COORDINATE) => {
             this.addChild(new Brick(color, coords));
         });
+
+        this.position.x = Math.floor(WIDTH / 2 - 1) * BRICK_WIDTH;
     }
 
     // Get coordinates if figure will be moved to offsetX, offsetY
