@@ -31,8 +31,8 @@ export class BaseFigure extends PIXI.Container {
             const {x, y} = brick.getGlobalPosition();
 
             return {
-                x: x - this.pivot.x + offsetX * BRICK_WIDTH,
-                y: y - this.pivot.y + offsetY * BRICK_WIDTH
+                x: x - brick.pivot.x + offsetX * BRICK_WIDTH + BRICK_WIDTH / 2,
+                y: y - brick.pivot.y + offsetY * BRICK_WIDTH
             }
         });
     }
