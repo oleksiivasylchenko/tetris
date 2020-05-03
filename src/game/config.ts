@@ -6,7 +6,7 @@ export type COORDINATE = {
 
 export type FIGURE = {
     coords: COORDINATE[],
-    color: number
+    color: string
 };
 
 export type OFFSET_X = -1|0|1;
@@ -26,7 +26,7 @@ export const FIGURES_MAP:FIGURE[] = [
             {x: 0, y: 1},
             {x: 0, y: 2},
         ],
-        color: 0xFFFF00,
+        color: 'blue',
     },
     {
         coords: [
@@ -35,7 +35,7 @@ export const FIGURES_MAP:FIGURE[] = [
             {x: 1, y: 1},
             {x: 2, y: 1},
         ],
-        color: 0xFF0000
+        color: 'orange'
     },
     {
         coords: [
@@ -44,7 +44,7 @@ export const FIGURES_MAP:FIGURE[] = [
             {x: 0, y: 2},
             {x: 0, y: 3},
         ],
-        color: 0xFF00FF,
+        color: 'green',
     },
     {
         coords: [
@@ -53,6 +53,6 @@ export const FIGURES_MAP:FIGURE[] = [
             {x: 1, y: 0},
             {x: 1, y: 1},
         ],
-        color: 0x00FFFF,
+        color: 'yellow',
     },
 ];

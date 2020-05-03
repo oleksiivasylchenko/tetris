@@ -2,6 +2,7 @@ import {BRICK_WIDTH, FIGURE, FIGURES_MAP, WIDTH} from "./config";
 import * as PIXI from "pixi.js";
 import {BaseFigure} from "./BaseFigure";
 import Model from "./Model";
+import {ImageFactory} from "./ImageFactory";
 
 export default class Controller {
 
@@ -22,9 +23,9 @@ export default class Controller {
         }
     }
 
-    addNextFigure(tempContainer:PIXI.Container, f:Function) {
+    addNextFigure(imageFactory:ImageFactory, tempContainer:PIXI.Container, f:Function) {
         this.addOperation(() => {
-            const currentFigure = this.getRandomFigure();
+            const currentFigure = this.getRandomFigure(imageFactory);
             tempContainer.addChild(currentFigure);
             f(currentFigure);
         });
@@ -121,8 +122,8 @@ export default class Controller {
         return FIGURES_MAP[index];
     }
 
-    protected getRandomFigure() {
-        return new BaseFigure(this.getRandomFigureIndex());
+    protected getRandomFigure(imageFactory:ImageFactory) {
+        return new BaseFigure(imageFactory, this.getRandomFigureIndex());
     }
 
 }

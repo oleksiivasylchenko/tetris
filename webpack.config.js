@@ -18,7 +18,7 @@ module.exports = (env) => ({
   resolve: {
     extensions: [ '.tsx', '.ts', '.js' ],
     alias: {
-      libs: __dirname + '/src/libs',
+      images: __dirname + '/src/images',
     }
   },
   module: {
@@ -73,14 +73,8 @@ module.exports = (env) => ({
         ]
       },
       {
-        test: /\.(png|jp(e*)g|svg)$/,
-        use: [{
-          loader: 'url-loader',
-          options: {
-            limit: 800000, // Convert images < 8kb to base64 strings
-            name:  __dirname + '/public/images/[name].[ext]'
-          }
-        }]
+        test: /\.(jpe?g|png|gif|svg)$/i,
+        loader: "url-loader?name=public/images/[name].[ext]"
       },
       {
         test: /\.(ttf|eot|woff|woff2)$/,

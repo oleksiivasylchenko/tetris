@@ -1,16 +1,17 @@
 import * as PIXI from 'pixi.js';
-import {BRICK_WIDTH, COORDINATE, FIGURE, HEIGHT, OFFSET_X, OFFSET_Y, WIDTH} from "./config";
+import {BRICK_WIDTH, COORDINATE, FIGURE, OFFSET_X, OFFSET_Y, WIDTH} from "./config";
 import Brick from "./Brick";
+import {ImageFactory} from "./ImageFactory";
 
 export class BaseFigure extends PIXI.Container {
 
-    constructor(config:FIGURE) {
+    constructor(imageFactory:ImageFactory, config:FIGURE) {
         super();
 
         const {color} = config;
 
         config.coords.forEach((coords:COORDINATE) => {
-            this.addChild(new Brick(color, coords));
+            this.addChild(new Brick(imageFactory, color, coords));
         });
 
         this.position.x = Math.floor(WIDTH / 2 - 1) * BRICK_WIDTH;
@@ -26,6 +27,27 @@ export class BaseFigure extends PIXI.Container {
                 y: y + offsetY * BRICK_WIDTH
             }
         });
+    }
+
+    getClone() {
+        /*const clone = new PIXI.Container();
+        this.children.forEach(b => {
+            const {x, y} = b.position;
+
+            clone.addChild(new Brick(0xff0000, {
+                x: x / BRICK_WIDTH,
+                y: y / BRICK_WIDTH,
+            }));
+        });
+
+        const {x, y} = this.position;
+
+        clone.pivot.set(clone.width / 2, clone.height / 2);
+        clone.rotation = Math.PI / 2;
+        clone.position.x = x + clone.width / 2;
+        clone.position.y = y + clone.height / 2;
+
+        return clone;*/
     }
 
 }

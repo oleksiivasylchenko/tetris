@@ -4,6 +4,7 @@ import {BaseFigure} from "./BaseFigure";
 import Model from "./Model";
 import Controller from "./Controller";
 import {isEdgePosition, isFinalPosition, isGameOverPosition} from "./PositionChecker";
+import {ImageFactory} from "./ImageFactory";
 
 export class Application {
 
@@ -14,8 +15,10 @@ export class Application {
     model: Model = new Model();
     controller: Controller;
     tickerIdentificator: NodeJS.Timeout;
+    imageFactory:ImageFactory;
 
     constructor(stage) {
+        this.imageFactory = new ImageFactory();
 
         this.stageContainer = new PIXI.Container();
         this.tempContainer = new PIXI.Container();
@@ -26,7 +29,9 @@ export class Application {
         stage.addChild(this.stageContainer);
     }
 
-    start() {
+    async start() {
+        await this.imageFactory.loadImages();
+
         window.document.addEventListener('keyup', this.onKeyDown.bind(this));
 
         //this.timeStart = new Date().getTime();
@@ -80,13 +85,18 @@ export class Application {
 
     protected addNextFigure() {
 
-        this.controller.addNextFigure(this.tempContainer, (figure:BaseFigure) => {
+        this.controller.addNextFigure(this.imageFactory, this.tempContainer, (figure:BaseFigure) => {
             this.currentFigure = figure;
         });
     }
 
     protected onKeyDown(event) {
-        if (event.code === 'ArrowDown') {
+        if (event.code === 'ArrowUp') {
+            /*const clone = this.currentFigure.getClone();
+            console.log(clone.position, 'POSITION');
+            requestAnimationFrame(() => this.stageContainer.addChild(clone));*/
+
+        } else if (event.code === 'ArrowDown') {
             this.controller.addOperation(() => this.step(0, 1));
         } else if (event.code === 'ArrowRight') {
             this.controller.addOperation(() => this.step(1, 0));
