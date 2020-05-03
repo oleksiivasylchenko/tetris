@@ -1,4 +1,4 @@
-import {FIGURE, FIGURES_MAP, WIDTH} from "./config";
+import {BRICK_WIDTH, FIGURE, FIGURES_MAP, WIDTH} from "./config";
 import * as PIXI from "pixi.js";
 import {BaseFigure} from "./BaseFigure";
 import GraphicController from './GraphicController';
@@ -23,7 +23,7 @@ export default class Controller {
         return new BaseFigure(this.getRandomFigureIndex());
     }
 
-    getFullLines():{number:number} {
+    getFullLines():number[] {
         const bricksPerLineMap = this.getBricksPerLine();
 
         return Controller.getFullLines(bricksPerLineMap);
@@ -44,11 +44,11 @@ export default class Controller {
         });
     }
 
-    removeFullLines(fullLines:{number:number}) {
+    removeFullLines(fullLines:number[]) {
 
-        Object.keys(fullLines) && this.stageContainer.children.forEach((brick:PIXI.Container) => {
+        this.stageContainer.children.forEach((brick:PIXI.Container) => {
 
-            if (Object.keys(fullLines).includes('' + brick.getGlobalPosition().y)) {
+            if (fullLines.includes(brick.getGlobalPosition().y)) {
                 const operation = () => {
                     this.stageContainer.removeChild(brick);
                 };
@@ -56,6 +56,22 @@ export default class Controller {
                 this.model.addOperation(operation);
             }
         });
+    }
+
+    removeEmptyLines(fullLines:number[]) {
+
+        fullLines.sort().reverse().forEach((lineIndex:number) => {
+            const bricksUpper = this.stageContainer.children.filter((brick:PIXI.Container) => brick.getGlobalPosition().y < lineIndex);
+
+            if (bricksUpper.length) {
+                bricksUpper.map((brick:PIXI.Container) => {
+                    this.model.addOperation(() => {
+                        brick.position.y += BRICK_WIDTH;
+                    });
+                });
+            }
+        });
+
     }
 
     protected getBricksPerLine() {
@@ -71,15 +87,15 @@ export default class Controller {
             }, {});
     }
 
-    protected static getFullLines(bricksPerLineMap:any):any {
+    protected static getFullLines(bricksPerLineMap:any):number[] {
         return Object.keys(bricksPerLineMap)
             .reduce((fullLines, key) => {
                 if (bricksPerLineMap[key] === WIDTH) {
-                    fullLines[key] = bricksPerLineMap[key];
+                    fullLines.push(+key);
                 }
 
                 return fullLines;
-            }, {});
+            }, []);
     }
 
     protected getRandomFigureIndex():FIGURE {

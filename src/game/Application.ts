@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js';
 import {BRICK_WIDTH, FIGURE, FIGURES_MAP, OFFSET_X, OFFSET_Y, STEP_DELAY} from "./config";
 import {BaseFigure} from "./BaseFigure";
-import Model, {MODE} from "./Model";
+import Model from "./Model";
 import Controller from "./Controller";
 import {isEdgePosition, isFinalPosition} from "./PositionChecker";
 import GraphicController from "./GraphicController";
@@ -40,23 +40,16 @@ export class Application {
         if (!this.timeStart) this.timeStart = timeEnd;
         const progress = timeEnd - this.timeStart;
 
+        this.checkFullLines();
+
         if (this.model.hasOperation()) {
             this.controller.processOperation();
-        } else if (this.model.isMode(MODE.fillEmptyLines)) {
-            this.graphController.fillEmptyLines();
-
-            if (!this.model.getEmptyLines().size) {
-                console.log('NEXT!!!');
-                this.model.setNextMode();
-            }
         } else {
             this.checkPosition();
 
             if (progress >= STEP_DELAY && this.step()) {
                 delete this.timeStart;
             }
-
-            this.checkFullLines();
         }
     };
 
@@ -100,11 +93,12 @@ export class Application {
     }
 
     protected checkFullLines() {
-
         const fullLines = this.controller.getFullLines();
 
-        if (Object.keys(fullLines).length) {
+        if (fullLines.length) {
             this.controller.removeFullLines(fullLines);
+            this.controller.removeEmptyLines(fullLines);
         }
     }
+
 }
