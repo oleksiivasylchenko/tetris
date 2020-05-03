@@ -1,4 +1,4 @@
-import {BRICK_WIDTH, FIGURE, FIGURES_MAP, OFFSET_X, OFFSET_Y, WIDTH} from "./config";
+import {BRICK_WIDTH, FIGURE, FIGURES_MAP, WIDTH} from "./config";
 import * as PIXI from "pixi.js";
 import {BaseFigure} from "./BaseFigure";
 import Model from "./Model";
@@ -13,9 +13,13 @@ export default class Controller {
         this.model = model;
     }
 
-    processOperation() {
+    processOperations() {
         const f = this.model.getOperation();
-        f();
+
+        if (f !== undefined) {
+            f();
+            this.processOperations();
+        }
     }
 
     addNextFigure(tempContainer:PIXI.Container, f:Function) {

@@ -39,7 +39,7 @@ export class Application {
         const progress = timeEnd - this.timeStart;
 
         if (this.model.hasOperation()) {
-            this.controller.processOperation();
+            this.controller.processOperations();
         } else if(this.currentFigure === null) {
             this.addNextFigure();
         } else {
