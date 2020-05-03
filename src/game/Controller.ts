@@ -63,7 +63,7 @@ export default class Controller {
 
     removeEmptyLines(fullLines:number[]) {
 
-        fullLines.sort().reverse().forEach((lineIndex:number) => {
+        fullLines.sort().forEach((lineIndex:number) => {
             const bricksUpper = this.stageContainer.children.filter((brick:PIXI.Container) => brick.getGlobalPosition().y < lineIndex);
 
             if (bricksUpper.length) {
