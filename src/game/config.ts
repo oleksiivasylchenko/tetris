@@ -1,13 +1,15 @@
 // TYPES
+import {COLOR, COORDS} from "./Stage/Module";
+
 export type COORDINATE = {
     x: number,
     y: number
 };
 
 export type FIGURE = {
-    coords: COORDINATE[],
-    center: COORDINATE,
-    color: string
+    coords: COORDS[],
+    center: COORDS,
+    color: COLOR
 };
 
 export type OFFSET_X = -1|0|1;
@@ -34,7 +36,7 @@ export const FIGURES_MAP:FIGURE[] = [
             x: 0.5,
             y: 1.5,
         },
-        color: 'blue',
+        color: COLOR.BLUE,
     },
     {
         //  x
@@ -50,7 +52,7 @@ export const FIGURES_MAP:FIGURE[] = [
             x: 1.5,
             y: 1.5,
         },
-        color: 'orange'
+        color: COLOR.ORANGE,
     },
     {
         // x
@@ -67,7 +69,7 @@ export const FIGURES_MAP:FIGURE[] = [
             x: 0.5,
             y: 2.5,
         },
-        color: 'green',
+        color: COLOR.GREEN,
     },
     {
         // xx
@@ -82,6 +84,6 @@ export const FIGURES_MAP:FIGURE[] = [
             x: 1,
             y: 1,
         },
-        color: 'yellow',
+        color: COLOR.YELLOW,
     },
 ];

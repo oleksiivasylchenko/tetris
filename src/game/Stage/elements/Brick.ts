@@ -1,15 +1,14 @@
 import * as PIXI from 'pixi.js';
-import {BRICK_WIDTH, COORDINATE} from "./config";
-import {ImageFactory} from "./ImageFactory";
+import {BRICK_WIDTH} from "../../config";
+import {COLOR, COORDS} from "../Module";
 
 export default class extends PIXI.Sprite {
 
-    constructor(imageFactory:ImageFactory, color: string, coords:COORDINATE) {
+    constructor(coords:COORDS, color: COLOR) {
+
         super();
 
-        const image = imageFactory.getImage(color);
-
-        this.texture = PIXI.Texture.from(image);
+        this.texture = PIXI.Texture.from('public/images/block_' + color +'.png');
 
         this.pivot.x = BRICK_WIDTH / 2;
         this.pivot.y = BRICK_WIDTH / 2;

@@ -1,28 +1,19 @@
 import * as PIXI from 'pixi.js';
 import {STEP_DELAY} from "./config";
-import {ImageFactory} from "./ImageFactory";
+import Module from "./Stage/Module";
 
 export class Application {
 
-    stageContainer:PIXI.Container;
-    tempContainer:PIXI.Container;
     timeStart: number;
     tickerId: NodeJS.Timeout;
-    imageFactory:ImageFactory;
+    stage: PIXI.Container;
 
     constructor(stage) {
-        this.imageFactory = new ImageFactory();
-
-        this.stageContainer = new PIXI.Container();
-        this.tempContainer = new PIXI.Container();
-
-        stage.addChild(this.tempContainer);
-        stage.addChild(this.stageContainer);
+        this.stage = stage;
     }
 
     async start() {
-        await this.imageFactory.loadImages();
-
+        const module = new Module(this.stage);
         this.timeStart = new Date().getTime();
         const fps = 1000 / 2000;
         this.tickerId = setInterval(() => requestAnimationFrame(this.ticker), fps);
