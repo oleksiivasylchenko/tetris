@@ -4,7 +4,7 @@
   "description": "Tetris game with PIXI.js",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "build": "webpack --mode=development",
     "start": "webpack-dev-server --mode=development --env.app=tetris"
   },
@@ -25,6 +25,7 @@
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "babel-preset-stage-0": "^6.24.1",
+    "ts-jest": "^26.3.0",
     "ts-loader": "^7.0.2",
     "typescript": "^3.8.3",
     "webpack": "^4.31.0",
@@ -34,6 +35,7 @@
   },
   "dependencies": {
     "install": "^0.13.0",
+    "jest": "^26.4.2",
     "npm": "^6.14.4",
     "pixi.js": "^5.2.3"
   }
